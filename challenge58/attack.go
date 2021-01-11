@@ -98,7 +98,7 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 
 	bob, err := dh.NewKey(g, p, q)
 	if err != nil {
-		return errors.New(fmt.Sprintf("couldn't create Bob key pair: %s", err.Error()))
+		return fmt.Errorf("couldn't create Bob key pair: %s", err.Error())
 	}
 
 	var modules, remainders []*big.Int
@@ -111,13 +111,13 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 		for h.Cmp(helpers.BigOne) == 0 {
 			rand, err := helpers.GenerateBigInt(p)
 			if err != nil {
-				return errors.New(fmt.Sprintf("couldn't generate random big.Int: %s", err.Error()))
+				return fmt.Errorf("couldn't generate random big.Int: %s", err.Error())
 			}
 
 			for rand.Cmp(helpers.BigZero) == 0 {
 				rand, err = helpers.GenerateBigInt(p)
 				if err != nil {
-					return errors.New(fmt.Sprintf("couldn't generate random big.Int: %s", err.Error()))
+					return fmt.Errorf("couldn't generate random big.Int: %s", err.Error())
 				}
 			}
 
@@ -148,7 +148,7 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 	// x = n mod r
 	n, r, err := helpers.ChineseRemainderTheorem(remainders, modules)
 	if err != nil {
-		return errors.New(fmt.Sprintf("chinese remainder theorem: %s", err.Error()))
+		return fmt.Errorf("chinese remainder theorem: %s", err.Error())
 	}
 
 	y := bob.GetPublicKey()
