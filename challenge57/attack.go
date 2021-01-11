@@ -19,7 +19,7 @@ func SmallSubgroupAttack(g, p, q, j *big.Int) error {
 
 	bob, err := dh.NewKey(g, p, q)
 	if err != nil {
-		return errors.New(fmt.Sprintf("couldn't create Bob key pair: %s", err.Error()))
+		return fmt.Errorf("couldn't create Bob key pair: %s", err.Error())
 	}
 
 	var modules, remainders []*big.Int
@@ -32,13 +32,13 @@ func SmallSubgroupAttack(g, p, q, j *big.Int) error {
 		for h.Cmp(helpers.BigOne) == 0 {
 			rand, err := helpers.GenerateBigInt(p)
 			if err != nil {
-				return errors.New(fmt.Sprintf("couldn't generate random big.Int: %s", err.Error()))
+				return fmt.Errorf("couldn't generate random big.Int: %s", err.Error())
 			}
 
 			for rand.Cmp(helpers.BigZero) == 0 {
 				rand, err = helpers.GenerateBigInt(p)
 				if err != nil {
-					return errors.New(fmt.Sprintf("couldn't generate random big.Int: %s", err.Error()))
+					return fmt.Errorf("couldn't generate random big.Int: %s", err.Error())
 				}
 			}
 
@@ -80,7 +80,7 @@ func SmallSubgroupAttack(g, p, q, j *big.Int) error {
 	// reassemble Bob's secret key using the Chinese Remainder Theorem
 	x, _, err := helpers.ChineseRemainderTheorem(remainders, modules)
 	if err != nil {
-		return errors.New(fmt.Sprintf("chinese remainder theorem: %s", err.Error()))
+		return fmt.Errorf("chinese remainder theorem: %s", err.Error())
 	}
 
 	if bob.ComparePrivateKey(x) {
