@@ -21,7 +21,8 @@ func f(y, k, p *big.Int) *big.Int {
 // calcK calculates k based on a formula in this paper: https://arxiv.org/pdf/0812.0789.pdf
 func calcK(a, b *big.Int) *big.Int {
 	// k = log2(sqrt(b-a)) + log2(log2(sqrt(b-a))) - 2
-	logSqrt := math.Log2(float64(new(big.Int).Sub(b, a).Uint64()))
+	sqrtba := math.Sqrt(float64(new(big.Int).Sub(b, a).Uint64()))
+	logSqrt := math.Log2(sqrtba)
 	logLogSqrt := math.Log2(logSqrt)
 	return new(big.Int).SetUint64(uint64(logSqrt + logLogSqrt - 2))
 }
