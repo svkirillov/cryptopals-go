@@ -4,7 +4,7 @@ on:
   push:
     branches: [$default-branch]
   pull_request:
-    branches: [$default-branch, challenge57]
+    branches: [$default-branch]
 
 jobs:
   common-packages:
