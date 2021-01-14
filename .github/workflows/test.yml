@@ -10,7 +10,7 @@ jobs:
   common-packages:
     name: Run tests for common packages
     runs-on: ubuntu-latest
-    stragegy:
+    strategy:
       matrix:
         packages: [dh, helpers]
     steps:
