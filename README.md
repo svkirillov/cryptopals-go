@@ -1,5 +1,15 @@
 # cryptopals-go
 
+## Challenge 57
+
+Terms of challenge: [challenge57.txt](./tasks/challenge57.txt)
+
+Run all tests for challenge 57:
+
+```sh
+make challenge57
+```
+
 ## Challenge 58
 
 Terms of challenge: [challenge58.txt](./tasks/challenge58.txt)
