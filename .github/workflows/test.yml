@@ -1,10 +1,13 @@
 name: Run test for Cryptopals challenges
 
+env:
+  GOLANG_VER: 1.15
+
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [$default-branch]
   pull_request:
-    branches: [ $default-branch, challenge57 ]
+    branches: [$default-branch, challenge57]
 
 jobs:
   common-packages:
@@ -20,12 +23,13 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.15
+          go-version: GOLANG_VER
 
-      - name: Run test for package `${{ matrix.packages }}'
+      - name: Run tests for package `${{ matrix.packages }}'
         run: go test -v -count=1 ./${{ matrix.packages }}
 
   challenge57:
+    name: Run tests for challenge 57
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -34,7 +38,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.15
+          go-version: GOLANG_VER
 
-      - name: Run test for challenge 57
+      - name: Run tests for challenge 57
         run: go test -v -count=1 ./challenge57
