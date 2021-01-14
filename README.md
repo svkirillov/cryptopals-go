@@ -10,15 +10,8 @@ Run a test for Pollard's Method for Catching Kangaroos Algorithm:
 go test -v -count=1 ./challenge58 -run TestCatchWildKangaroo
 ```
 
-
-Run a quick test for Catching Kangaroos Attack:
-
-```sh
-go test -v -count=1 ./challenge58 -run TestCatchingKangaroosAttackFast
-```
-
-Run a slow test for Catching Kangaroos Attack:
+Run a test for Catching Kangaroos Attack:
 
 ```sh
-go test -v -count=1 ./challenge58 -run TestCatchingKangaroosAttackSlow
+go test -v -count=1 ./challenge58 -run TestCatchingKangaroosAttack
 ```
