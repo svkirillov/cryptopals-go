@@ -174,8 +174,8 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 		return errors.New("got wrong value from CatchingWildKangaroo")
 	}
 
-	// x = n - m*r
-	x := new(big.Int).Sub(n, tmp.Mul(m, r))
+	// x = n + m*r
+	x := new(big.Int).Add(n, tmp.Mul(m, r))
 
 	if bob.ComparePrivateKey(x) {
 		return nil
