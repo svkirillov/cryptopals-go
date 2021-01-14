@@ -2,9 +2,9 @@ name: Run test for Cryptopals challenges
 
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ master ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ master ]
 
 jobs:
   common-packages:
