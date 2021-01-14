@@ -1,3 +1,5 @@
+.PHONY: all challenge58
+
 all: challenge57
 
 challenge57:
