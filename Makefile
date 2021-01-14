@@ -1,4 +1,4 @@
-.PHONY: all challenge58
+.PHONY: all challenge57
 
 all: challenge57
 
