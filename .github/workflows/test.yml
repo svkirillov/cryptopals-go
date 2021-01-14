@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        packages: [ dh, elliptic helpers ]
+        packages: [ dh, elliptic, helpers ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
