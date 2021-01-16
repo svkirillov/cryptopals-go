@@ -155,12 +155,14 @@ func GenerateKey(curve Curve, rng io.Reader) (priv []byte, x, y *big.Int, err er
 		if err != nil {
 			return
 		}
+
 		if new(big.Int).SetBytes(priv).Cmp(N) >= 0 {
 			continue
 		}
 
 		x, y = curve.ScalarBaseMult(priv)
 	}
+
 	return
 }
 
@@ -168,6 +170,7 @@ func Inverse(curve Curve, x, y *big.Int) (ix *big.Int, iy *big.Int) {
 	ix = new(big.Int).Set(x)
 	iy = new(big.Int).Sub(curve.Params().P, y)
 	iy.Mod(iy, curve.Params().P)
+
 	return
 }
 
@@ -205,6 +208,7 @@ func Marshal(curve Curve, x, y *big.Int) []byte {
 	copy(ret[1+byteLen-len(xBytes):], xBytes)
 	yBytes := y.Bytes()
 	copy(ret[1+2*byteLen-len(yBytes):], yBytes)
+
 	return ret
 }
 
@@ -216,18 +220,24 @@ func Unmarshal(curve Curve, data []byte) (x, y *big.Int) {
 	if len(data) != 1+2*byteLen {
 		return
 	}
+
 	if data[0] != 4 { // uncompressed form
 		return
 	}
+
 	p := curve.Params().P
+
 	x = new(big.Int).SetBytes(data[1 : 1+byteLen])
 	y = new(big.Int).SetBytes(data[1+byteLen:])
+
 	if x.Cmp(p) >= 0 || y.Cmp(p) >= 0 {
 		return nil, nil
 	}
+
 	if !curve.IsOnCurve(x, y) {
 		return nil, nil
 	}
+
 	return
 }
 

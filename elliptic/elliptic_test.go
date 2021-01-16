@@ -156,7 +156,6 @@ func TestP256Mult(t *testing.T) {
 }
 
 var p224BaseMultTests = []baseMultTest{
-
 	{
 		"1",
 		"b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",
@@ -427,10 +426,12 @@ func TestP224BaseMult(t *testing.T) {
 		if !ok {
 			t.Errorf("%d: bad value for k: %s", i, e.k)
 		}
+
 		x, y := p224.ScalarBaseMult(k.Bytes())
 		if fmt.Sprintf("%x", x) != e.x || fmt.Sprintf("%x", y) != e.y {
 			t.Errorf("%d: bad output for k=%s: got (%x, %x), want (%s, %s)", i, e.k, x, y, e.x, e.y)
 		}
+
 		if testing.Short() && i > 5 {
 			break
 		}
@@ -461,13 +462,16 @@ func TestBasePointOnCurve(t *testing.T) {
 
 func TestMarshalP128(t *testing.T) {
 	p128 := P128()
+
 	_, x, y, err := GenerateKey(p128, rand.Reader)
 	if err != nil {
 		t.Error(err)
 		return
 	}
+
 	serialized := Marshal(p128, x, y)
 	xx, yy := Unmarshal(p128, serialized)
+
 	if xx == nil {
 		t.Errorf("%s: failed to unmarshal", t.Name())
 		return
@@ -480,13 +484,16 @@ func TestMarshalP128(t *testing.T) {
 
 func TestMarshalP48(t *testing.T) {
 	p48 := P48()
+
 	_, x, y, err := GenerateKey(p48, rand.Reader)
 	if err != nil {
 		t.Error(err)
 		return
 	}
+
 	serialized := Marshal(p48, x, y)
 	xx, yy := Unmarshal(p48, serialized)
+
 	if xx == nil {
 		t.Errorf("%s: failed to unmarshal", t.Name())
 		return
@@ -542,12 +549,12 @@ func TestECDH(t *testing.T) {
 	}
 
 	// Alice computes a shared key.
-	zzax, zzay := p128.ScalarMult(xb, yb, sa)
+	ssax, ssay := p128.ScalarMult(xb, yb, sa)
 
 	// Bob computes a shared key.
-	zzbx, zzby := p128.ScalarMult(xa, ya, sb)
+	ssbx, ssby := p128.ScalarMult(xa, ya, sb)
 
-	if zzax.Cmp(zzbx) != 0 || zzay.Cmp(zzby) != 0 {
+	if ssax.Cmp(ssbx) != 0 || ssay.Cmp(ssby) != 0 {
 		t.Errorf("%s: Alice and Bob key agreement failed", t.Name())
 	}
 
