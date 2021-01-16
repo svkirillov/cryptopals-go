@@ -8,6 +8,8 @@ import (
 	"io"
 	"math/big"
 	"sync"
+
+	"github.com/svkirillov/cryptopals-go/helpers"
 )
 
 // A Curve represents a short-form Weierstrass curve y^2 = x^3 + a*x + b.
@@ -45,15 +47,59 @@ func (curve *CurveParams) Params() *CurveParams {
 
 func (curve *CurveParams) IsOnCurve(x, y *big.Int) bool {
 	// y^2 = x^3 + a*x + b
-	panic("not implemented")
-	return false
+
+	y2 := new(big.Int).Mul(y, y) // y2 := y^2
+	y2.Mod(y2, curve.P)          // y2 = y^2 mod curve.P
+
+	x3 := new(big.Int).Mul(x, x)   // x3 := x^2
+	x3.Mul(x3, x).Mod(x3, curve.P) // now x3 = x^3 mod curve.P
+
+	sum := new(big.Int).Mul(curve.A, x)     // sum := a*x
+	sum.Add(sum, x3)                        // sum = x^3 + a*x
+	sum.Add(sum, curve.B).Mod(sum, curve.P) // sum = x^3 + a*x + b mod curve.P
+
+	//  y^2 ?= x^3 + a*x + b
+	return y2.Cmp(sum) == 0
 }
 
 // Add takes two points (x1, y1) and (x2, y2) and returns their sum.
 // It is assumed that "point at infinity" is (0, 0).
 func (curve *CurveParams) Add(x1, y1, x2, y2 *big.Int) (x, y *big.Int) {
-	panic("not implemented")
-	return nil, nil
+	// https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Point_addition
+
+	if x1.Cmp(helpers.BigZero) == 0 && y1.Cmp(helpers.BigZero) == 0 {
+		return x2, y2
+	}
+
+	if x2.Cmp(helpers.BigZero) == 0 && y2.Cmp(helpers.BigZero) == 0 {
+		return x1, y1
+	}
+
+	ix, iy := Inverse(curve, x2, y2)
+	if x1.Cmp(ix) == 0 && y1.Cmp(iy) == 0 {
+		return new(big.Int).Set(helpers.BigZero), new(big.Int).Set(helpers.BigZero)
+	}
+
+	m := new(big.Int)
+	tmp := new(big.Int)
+
+	if x1.Cmp(x2) == 0 && y1.Cmp(y2) == 0 {
+		tmp.Mul(helpers.BigTwo, y1).ModInverse(tmp, curve.P)                                                    // tmp = (2 * y1) ^ (-1) mod curve.P
+		m.Exp(x1, helpers.BigTwo, curve.P).Mul(m, helpers.BigThree).Add(m, curve.A).Mul(m, tmp).Mod(m, curve.P) // m = (3 * (x1 ^ 2) + a) * ((2 * y1) ^ (-1) mod curve.P) mod curve.P
+	} else {
+		tmp.Sub(x2, x1).ModInverse(tmp, curve.P)  // tmp = (x2 - x1) ^ (-1) mod curve.P
+		m.Sub(y2, y1).Mul(m, tmp).Mod(m, curve.P) // m = (y2 - y1) * ((x2 - x1) ^ (-1) mod curve.P) mod curve.P
+	}
+
+	tmp.Add(x1, x2).Neg(tmp).Mod(tmp, curve.P)         // tmp = -(x1 + x2) mod curve.P
+	x3 := new(big.Int).Exp(m, helpers.BigTwo, curve.P) // x3 := m ^ 2 mod curve.P
+	x3.Add(x3, tmp).Mod(x3, curve.P)                   // x3 = m ^ 2 - (x1 + x2) mod curve.P
+
+	tmp.Sub(x1, x3).Mod(tmp, curve.P)                // tmp = (x1 - x3) mod curve.P
+	y3 := new(big.Int).Mul(m, tmp)                   // y3 := m * (x1 - x3)
+	y3.Mod(y3, curve.P).Sub(y3, y1).Mod(y3, curve.P) // y3 = m * (x1 - x3) - y1 mod curve.P
+
+	return x3, y3
 }
 
 func (curve *CurveParams) Double(x1, y1 *big.Int) (x, y *big.Int) {
@@ -61,8 +107,33 @@ func (curve *CurveParams) Double(x1, y1 *big.Int) (x, y *big.Int) {
 }
 
 func (curve *CurveParams) ScalarMult(xIn, yIn *big.Int, k []byte) (x, y *big.Int) {
-	panic("not implemented")
-	return nil, nil
+	// https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication#Double-and-add
+
+	x = new(big.Int).Set(helpers.BigZero)
+	y = new(big.Int).Set(helpers.BigZero)
+
+	if len(k) == 0 {
+		return
+	}
+
+	pointX := new(big.Int).Set(xIn)
+	pointY := new(big.Int).Set(yIn)
+
+	bigK := new(big.Int).SetBytes(k)
+
+	tmp := new(big.Int)
+
+	for bigK.Cmp(helpers.BigZero) != 0 {
+		if tmp.And(bigK, helpers.BigOne).Cmp(helpers.BigOne) == 0 {
+			x, y = curve.Add(x, y, pointX, pointY)
+		}
+
+		pointX, pointY = curve.Double(pointX, pointY)
+
+		bigK.Rsh(bigK, 1)
+	}
+
+	return
 }
 
 func (curve *CurveParams) ScalarBaseMult(k []byte) (x, y *big.Int) {
