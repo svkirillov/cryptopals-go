@@ -445,7 +445,7 @@ func TestBasePointOnCurve(t *testing.T) {
 
 	p4 := P4()
 	if !p4.IsOnCurve(big.NewInt(4), big.NewInt(3)) {
-		t.Errorf("%s: p3 FAIL", t.Name())
+		t.Errorf("%s: p4 FAIL", t.Name())
 	}
 
 	p128 := P128()
