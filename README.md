@@ -2,7 +2,7 @@
 
 ## Challenge 57
 
-Terms of challenge: [challenge57.txt](./tasks/challenge57.txt)
+Terms of challenge: [challenge57.txt](docs/challenge57.txt)
 
 Run all tests for challenge 57:
 
@@ -12,7 +12,7 @@ make challenge57
 
 ## Challenge 58
 
-Terms of challenge: [challenge58.txt](./tasks/challenge58.txt)
+Terms of challenge: [challenge58.txt](docs/challenge58.txt)
 
 Run all tests for challenge 58:
 
@@ -34,7 +34,7 @@ go test -v -count=1 ./challenge58 -run TestCatchingKangaroosAttack
 
 ## Challenge 59
 
-Terms of challenge: [challenge59.txt](./tasks/challenge59.txt)
+Terms of challenge: [challenge59.txt](docs/challenge59.txt)
 
 Run all tests for challenge 59:
 
