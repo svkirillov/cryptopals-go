@@ -31,3 +31,13 @@ Run a test for Catching Kangaroos Attack:
 ```sh
 go test -v -count=1 ./challenge58 -run TestCatchingKangaroosAttack
 ```
+
+## Challenge 59
+
+Terms of challenge: [challenge59.txt](./tasks/challenge59.txt)
+
+Run all tests for challenge 59:
+
+```sh
+make challenge59
+```
