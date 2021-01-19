@@ -38,7 +38,17 @@ func NewECDHAttackOracle(curve elliptic.Curve) (
 	}
 
 	isKeyCorrect = func(key []byte) bool {
-		return bytes.Equal(privateKey, key)
+		// skipping trailing zeros in fixed size big-endian byte representation of big.Int
+		// e.g. if the original private key is 886092136281582889795402858978242928
+		// then it's 16-byte representation will be [0 170 167 183 29 163 210 19 176 223 2 100 1 190 113 112]
+		// but the given key in big-endian byte representation derived from big.Int doesn't have first zero:
+		// [170 167 183 29 163 210 19 176 223 2 100 1 190 113 112]
+		i := 0
+		for privateKey[i] == 0 {
+			i++
+		}
+
+		return bytes.Equal(privateKey[i:], key)
 	}
 
 	getPublicKey = func() (*big.Int, *big.Int) {
