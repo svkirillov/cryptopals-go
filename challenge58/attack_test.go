@@ -4,7 +4,9 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/svkirillov/cryptopals-go/dh"
 	"github.com/svkirillov/cryptopals-go/helpers"
+	oracle2 "github.com/svkirillov/cryptopals-go/oracle"
 )
 
 func TestCatchWildKangaroo(t *testing.T) {
@@ -21,12 +23,16 @@ func TestCatchWildKangaroo(t *testing.T) {
 }
 
 func TestCatchingKangaroosAttack(t *testing.T) {
-	p := helpers.SetBigIntFromDec("11470374874925275658116663507232161402086650258453896274534991676898999262641581519101074740642369848233294239851519212341844337347119899874391456329785623")
-	g := helpers.SetBigIntFromDec("622952335333961296978159266084741085889881358738459939978290179936063635566740258555167783009058567397963466103140082647486611657350811560630587013183357")
-	q := helpers.SetBigIntFromDec("335062023296420808191071248367701059461")
-	j := new(big.Int).Div(new(big.Int).Sub(p, helpers.BigOne), q)
+	dhGroup := dh.MODP512V58()
 
-	if err := CatchingKangaroosAttack(g, p, q, j); err != nil {
-		t.Errorf("CatchingKangaroosAttack fails: %s", err.Error())
+	oracle, isKeyCorrect, getPublicKey := oracle2.NewDHAttackOracle(dhGroup)
+
+	privateKey, err := CatchingKangaroosAttack(dhGroup, oracle, getPublicKey)
+	if err != nil {
+		t.Fatalf("CatchingKangaroosAttack fails: %s", err.Error())
+	}
+
+	if !isKeyCorrect(privateKey.Bytes()) {
+		t.Fatal("computed key isn't equal to Bob's private key")
 	}
 }
