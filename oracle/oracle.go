@@ -69,7 +69,7 @@ func NewECDHAttackOracle(curve elliptic.Curve) (
 		// but the given key in big-endian byte representation derived from big.Int doesn't have first zero:
 		// [170 167 183 29 163 210 19 176 223 2 100 1 190 113 112]
 		i := 0
-		for privateKey[i] == 0 {
+		for i < len(privateKey) && privateKey[i] == 0 {
 			i++
 		}
 
