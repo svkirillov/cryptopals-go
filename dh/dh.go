@@ -1,60 +1,75 @@
 package dh
 
 import (
-	"math"
+	"crypto/rand"
+	"io"
 	"math/big"
-
-	"github.com/svkirillov/cryptopals-go/helpers"
 )
 
-// Key struct represents a key pair with group parameters
-type Key struct {
-	g *big.Int // g is a subgroup generator of order q
-	p *big.Int // p is group order
-	q *big.Int // q is subgroup order
-
-	privateKey *big.Int
-	publicKey  *big.Int
+type DHKey struct {
+	Private *big.Int
+	Public  *big.Int
 }
 
-// NewKey creates new key pair with the specified group parameters
-func NewKey(g *big.Int, p *big.Int, q *big.Int) (*Key, error) {
-	k := Key{
-		g:          new(big.Int).Set(g),
-		p:          new(big.Int).Set(p),
-		q:          new(big.Int).Set(q),
-		privateKey: nil,
-		publicKey:  nil,
+type DHScheme interface {
+	// GenerateECKeyPair generates a new key pair using random as a source of
+	// entropy.
+	GenerateKey(random io.Reader) (*DHKey, error)
+
+	// DH performs a Diffie-Hellman calculation between the provided private and
+	// public keys and returns the result.
+	DH(private, public *big.Int) *big.Int
+
+	// DHLen is the number of bites returned by DH.
+	DHLen() int
+
+	// DHName is the name of the DH function.
+	DHName() string
+
+	// DHParams returns the parameters of the group.
+	DHParams() *GroupParams
+}
+
+// GroupParams contains the parameters of an DH group and also provides
+// a generic, non-constant time implementation of DH.
+type GroupParams struct {
+	P       *big.Int // P is group order
+	G       *big.Int // G is a subgroup generator of order Q
+	Q       *big.Int // Q is subgroup order
+	Name    string
+	BitSize int
+}
+
+func (g *GroupParams) DHParams() *GroupParams {
+	return g
+}
+
+func (g GroupParams) GenerateKey(rng io.Reader) (*DHKey, error) {
+	if rng == nil {
+		rng = rand.Reader
 	}
 
-	var err error
-
-	if q.Cmp(helpers.BigZero) == 0 {
-		k.privateKey, err = helpers.GenerateBigInt(big.NewInt(math.MaxInt64))
-	} else {
-		k.privateKey, err = helpers.GenerateBigInt(q)
-	}
-
+	privateKey, err := rand.Int(rand.Reader, g.Q)
 	if err != nil {
 		return nil, err
 	}
 
-	k.publicKey = new(big.Int).Exp(k.g, k.privateKey, k.p)
+	publicKey := new(big.Int).Exp(g.G, privateKey, g.P)
 
-	return &k, nil
+	return &DHKey{
+		Private: privateKey,
+		Public:  publicKey,
+	}, nil
 }
 
-// GetPublicKey returns copy of publicKey
-func (k *Key) GetPublicKey() *big.Int {
-	return new(big.Int).Set(k.publicKey)
+func (g GroupParams) DH(private, public *big.Int) *big.Int {
+	return new(big.Int).Exp(public, private, g.P)
 }
 
-// SharedSecret performs DH with a given public key and return shared secret
-func (k *Key) SharedSecret(pubKey *big.Int) *big.Int {
-	return new(big.Int).Exp(pubKey, k.privateKey, k.p)
+func (g GroupParams) DHLen() int {
+	return g.BitSize
 }
 
-// ComparePrivateKey compares a given private key with own one
-func (k *Key) ComparePrivateKey(privKey *big.Int) bool {
-	return k.privateKey.Cmp(privKey) == 0
+func (g GroupParams) DHName() string {
+	return g.Name
 }

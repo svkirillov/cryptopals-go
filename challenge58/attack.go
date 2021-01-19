@@ -9,6 +9,7 @@ import (
 
 	"github.com/svkirillov/cryptopals-go/dh"
 	"github.com/svkirillov/cryptopals-go/helpers"
+	"github.com/svkirillov/cryptopals-go/oracle"
 )
 
 // f maps group elements to scalars.
@@ -90,16 +91,21 @@ func CatchingWildKangaroo(g, y, p *big.Int, a, b *big.Int) *big.Int {
 	return nil
 }
 
-func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
+func CatchingKangaroosAttack(
+	dhGroup dh.DHScheme,
+	oracleDH func(publicKey *big.Int) []byte,
+	getPublicKey func() *big.Int,
+) (*big.Int, error) {
+	p := dhGroup.DHParams().P
+	g := dhGroup.DHParams().G
+	q := dhGroup.DHParams().Q
+
+	j := new(big.Int).Div(new(big.Int).Sub(p, helpers.BigOne), q)
+
 	// Step #0
 	jFactors := helpers.Factorize(j, big.NewInt(1<<16))
 	if len(jFactors) == 0 {
-		return errors.New("factors not found")
-	}
-
-	bob, err := dh.NewKey(g, p, q)
-	if err != nil {
-		return fmt.Errorf("couldn't create Bob key pair: %s", err.Error())
+		return nil, errors.New("factors not found")
 	}
 
 	var modules, remainders []*big.Int
@@ -112,13 +118,13 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 		for h.Cmp(helpers.BigOne) == 0 {
 			rand, err := helpers.GenerateBigInt(p)
 			if err != nil {
-				return fmt.Errorf("couldn't generate random big.Int: %s", err.Error())
+				return nil, fmt.Errorf("couldn'ss generate random big.Int: %s", err.Error())
 			}
 
 			for rand.Cmp(helpers.BigZero) == 0 {
 				rand, err = helpers.GenerateBigInt(p)
 				if err != nil {
-					return fmt.Errorf("couldn't generate random big.Int: %s", err.Error())
+					return nil, fmt.Errorf("couldn'ss generate random big.Int: %s", err.Error())
 				}
 			}
 
@@ -126,15 +132,14 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 		}
 
 		// Step #2,3
-		k := bob.SharedSecret(h)
-		t := helpers.MAC(k.Bytes(), []byte("crazy flamboyant for the rap enjoyment"))
+		ss := oracleDH(h)
 
 		// Step #4
 		for i := big.NewInt(1); i.Cmp(r) <= 0; i.Add(i, helpers.BigOne) {
-			k1 := tmp.Exp(h, i, p)
-			t1 := helpers.MAC(k1.Bytes(), []byte("crazy flamboyant for the rap enjoyment"))
+			k1 := dhGroup.DH(i, h)
+			ss1 := oracle.MAC(k1.Bytes())
 
-			if hmac.Equal(t, t1) {
+			if hmac.Equal(ss, ss1) {
 				modules = append(modules, r)
 				remainders = append(remainders, new(big.Int).Set(i))
 				continue
@@ -143,16 +148,16 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 	}
 
 	if len(modules) == 0 {
-		return errors.New("empty sets of modules and remainders")
+		return nil, errors.New("empty sets of modules and remainders")
 	}
 
 	// x = n mod r
 	n, r, err := helpers.ChineseRemainderTheorem(remainders, modules)
 	if err != nil {
-		return fmt.Errorf("chinese remainder theorem: %s", err.Error())
+		return nil, fmt.Errorf("chinese remainder theorem: %s", err.Error())
 	}
 
-	y := bob.GetPublicKey()
+	y := getPublicKey()
 
 	// y' = y * g^-n
 	newY := new(big.Int).Mod(tmp.Mul(y, tmp.Exp(g, tmp.Neg(n), p)), p)
@@ -171,15 +176,11 @@ func CatchingKangaroosAttack(g, p, q, j *big.Int) error {
 
 	m := CatchingWildKangaroo(newG, newY, p, a, b)
 	if m == nil {
-		return errors.New("got wrong value from CatchingWildKangaroo")
+		return nil, errors.New("got wrong value from CatchingWildKangaroo")
 	}
 
 	// x = n + m*r
 	x := new(big.Int).Add(n, tmp.Mul(m, r))
 
-	if bob.ComparePrivateKey(x) {
-		return nil
-	}
-
-	return errors.New("computed key isn't equal to Bob's private key")
+	return x, nil
 }
