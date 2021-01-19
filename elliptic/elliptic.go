@@ -156,10 +156,6 @@ func GenerateKey(curve Curve, rng io.Reader) (priv []byte, x, y *big.Int, err er
 			return
 		}
 
-		if priv[0] == 0 {
-			continue
-		}
-
 		if new(big.Int).SetBytes(priv).Cmp(N) >= 0 {
 			continue
 		}
