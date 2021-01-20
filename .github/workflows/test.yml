@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        packages: [ dh, helpers, x128 ]
+        packages: [ elliptic, x128 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
