@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	BigZero = big.NewInt(0)
-	BigOne  = big.NewInt(1)
-	BigTwo  = big.NewInt(2)
+	BigZero  = big.NewInt(0)
+	BigOne   = big.NewInt(1)
+	BigTwo   = big.NewInt(2)
+	BigThree = big.NewInt(3)
 )
 
 // GenerateBigInt returns a uniform random value in [0, max)
