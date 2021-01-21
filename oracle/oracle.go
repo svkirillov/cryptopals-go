@@ -5,7 +5,6 @@ package oracle
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/rand"
 	"crypto/sha256"
 	"math/big"
 
@@ -28,7 +27,10 @@ func NewDHAttackOracle(dhGroup dh.DHScheme) (
 	isKeyCorrect func([]byte) bool,
 	getPublicKey func() *big.Int,
 ) {
-	dhKey, _ := dhGroup.GenerateKey(rand.Reader)
+	dhKey, err := dhGroup.GenerateKey(nil)
+	if err != nil {
+		panic(err)
+	}
 
 	dh = func(publicKey *big.Int) []byte {
 		sharedKey := dhGroup.DH(dhKey.Private, publicKey)
@@ -58,8 +60,7 @@ func NewECDHAttackOracle(curve elliptic.Curve) (
 
 	ecdh = func(x, y *big.Int) []byte {
 		sx, sy := curve.ScalarMult(x, y, privateKey)
-		k := append(elliptic.Marshal(curve, sx, sy))
-		return MAC(k)
+		return MAC(elliptic.Marshal(curve, sx, sy))
 	}
 
 	isKeyCorrect = func(key []byte) bool {
