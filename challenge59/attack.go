@@ -77,7 +77,7 @@ func InvalidCurveAttack(oracleECDH func(x, y *big.Int) []byte) (*big.Int, error)
 				if hmac.Equal(ss, ss1) && checkDuplicate(modules, remainders, factor, k) {
 					modules = append(modules, factor)
 					remainders = append(remainders, new(big.Int).Set(k))
-					continue
+					break
 				}
 			}
 		}
