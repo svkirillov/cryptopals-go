@@ -47,11 +47,14 @@ func calcN(p, k *big.Int) *big.Int {
 func tameKangaroo(g, b, p, k *big.Int) (xT, yT *big.Int) {
 	N := calcN(p, k)
 
+	// xT := 0
+	// yT := g^b
 	xT = new(big.Int).Set(helpers.BigZero)
 	yT = new(big.Int).Exp(g, b, p)
 
 	tmp := new(big.Int)
 
+	// for i in 1..N:
 	for i := new(big.Int).Set(helpers.BigZero); i.Cmp(N) < 0; i.Add(i, helpers.BigOne) {
 		// xT := xT + f(yT)
 		xT.Add(xT, f(yT, k, p))
@@ -68,6 +71,8 @@ func CatchingWildKangaroo(g, y, p *big.Int, a, b *big.Int) *big.Int {
 	k := calcK(a, b)
 	xT, yT := tameKangaroo(g, b, p, k)
 
+	// xW := 0
+	// yW := y
 	xW := new(big.Int).Set(helpers.BigZero)
 	yW := new(big.Int).Set(y)
 
