@@ -77,6 +77,8 @@ func CatchingWildKangaroo(g, y, p *big.Int, a, b *big.Int) *big.Int {
 	yW := new(big.Int).Set(y)
 
 	tmp := new(big.Int)
+
+	tmp.Sub(b, a).Add(tmp, xT)
 	xWUpperBound := new(big.Int).Set(tmp) // xWUpperBound := b - a + xT
 
 	// while xW < b - a + xT:

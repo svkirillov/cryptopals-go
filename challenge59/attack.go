@@ -42,7 +42,7 @@ func checkDuplicate(reminders []*big.Int, modules []*big.Int, r *big.Int, m *big
 	ok := true
 
 	for i := 0; i < len(reminders); i++ {
-		if reminders[i].Cmp(m) == 0 || modules[i].Cmp(r) == 0 {
+		if reminders[i].Cmp(r) == 0 && modules[i].Cmp(m) == 0 {
 			ok = false
 			break
 		}
