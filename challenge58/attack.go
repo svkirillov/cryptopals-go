@@ -166,7 +166,7 @@ func CatchingKangaroosAttack(
 	newG := new(big.Int).Exp(g, r, p)
 
 	// [a, b] = [0, (q-1)/r]
-	a := helpers.BigZero
+	a := new(big.Int).Set(helpers.BigZero)
 	b := new(big.Int).Div(tmp.Sub(q, helpers.BigOne), r)
 
 	// if q too small

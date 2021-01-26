@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        packages: [ dh, helpers ]
+        packages: [ dh, elliptic, helpers ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        challenges: [ challenge57, challenge58 ]
+        challenges: [ challenge57, challenge58, challenge59 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
