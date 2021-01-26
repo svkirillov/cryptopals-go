@@ -65,7 +65,7 @@ func Factorize(n *big.Int, upperBound *big.Int) []*big.Int {
 		if tmp.Cmp(BigZero) == 0 {
 			factors = append(factors, new(big.Int).Set(i))
 			for tmp.Mod(newN, i).Cmp(BigZero) == 0 {
-				newN.Set(tmp.Div(newN, i))
+				newN.Div(newN, i)
 			}
 		}
 

@@ -47,11 +47,14 @@ func calcN(p, k *big.Int) *big.Int {
 func tameKangaroo(g, b, p, k *big.Int) (xT, yT *big.Int) {
 	N := calcN(p, k)
 
+	// xT := 0
+	// yT := g^b
 	xT = new(big.Int).Set(helpers.BigZero)
 	yT = new(big.Int).Exp(g, b, p)
 
 	tmp := new(big.Int)
 
+	// for i in 1..N:
 	for i := new(big.Int).Set(helpers.BigZero); i.Cmp(N) < 0; i.Add(i, helpers.BigOne) {
 		// xT := xT + f(yT)
 		xT.Add(xT, f(yT, k, p))
@@ -68,18 +71,25 @@ func CatchingWildKangaroo(g, y, p *big.Int, a, b *big.Int) *big.Int {
 	k := calcK(a, b)
 	xT, yT := tameKangaroo(g, b, p, k)
 
+	// xW := 0
+	// yW := y
 	xW := new(big.Int).Set(helpers.BigZero)
 	yW := new(big.Int).Set(y)
 
 	tmp := new(big.Int)
 
+	tmp.Sub(b, a).Add(tmp, xT)
+	xWUpperBound := new(big.Int).Set(tmp) // xWUpperBound := b - a + xT
+
 	// while xW < b - a + xT:
-	for xW.Cmp(tmp.Add(tmp.Sub(b, a), xT)) < 0 {
+	for xW.Cmp(xWUpperBound) < 0 {
+		fVal := f(yW, k, p)
+
 		// xW := xW + f(yW)
-		xW.Add(xW, f(yW, k, p))
+		xW.Add(xW, fVal)
 
 		// yW := yW * g^f(yW)
-		yW.Mod(yW.Mul(yW, tmp.Exp(g, f(yW, k, p), p)), p)
+		yW.Mod(yW.Mul(yW, tmp.Exp(g, fVal, p)), p)
 
 		// if yW = yT:
 		if yW.Cmp(yT) == 0 {
