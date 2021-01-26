@@ -41,3 +41,25 @@ Run all tests for challenge 59:
 ```sh
 make challenge59
 ```
+
+## Challenge 60
+
+Terms of challenge: [challenge60.txt](docs/challenge60.txt)
+
+Run all tests for challenge 60:
+
+```sh
+make challenge60
+```
+
+Run a test for Pollard's Method for Catching Kangaroos Algorithm on an elliptic curve:
+
+```sh
+go test -v -count=1 ./challenge58 -run TestCatchWildKangaroo
+```
+
+Run a test for Insecure Twist Attack:
+
+```sh
+go test -v -count=1 ./challenge58 -run TestInsecureTwistAttack
+```
