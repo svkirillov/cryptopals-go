@@ -55,11 +55,11 @@ make challenge60
 Run a test for Pollard's Method for Catching Kangaroos Algorithm on an elliptic curve:
 
 ```sh
-go test -v -count=1 ./challenge58 -run TestCatchWildKangaroo
+go test -v -count=1 ./challenge60 -run TestECKangarooAlgorithm
 ```
 
 Run a test for Insecure Twist Attack:
 
 ```sh
-go test -v -count=1 ./challenge58 -run TestInsecureTwistAttack
+go test -v -count=1 ./challenge60 -run TestInsecureTwistAttack
 ```
