@@ -326,9 +326,9 @@ func getRemaindersOfPrivateKey(
 
 		select {
 		case e := <-answer:
-			if checkDuplicate(modules, remainders, e.module, e.reminder) {
-				modules = append(modules, e.module)
+			if checkDuplicate(remainders, modules, e.reminder, e.module) {
 				remainders = append(remainders, e.reminder)
+				modules = append(modules, e.module)
 
 				cancel()
 				break

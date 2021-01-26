@@ -77,14 +77,17 @@ func CatchingWildKangaroo(g, y, p *big.Int, a, b *big.Int) *big.Int {
 	yW := new(big.Int).Set(y)
 
 	tmp := new(big.Int)
+	xWUpperBound := new(big.Int).Set(tmp) // xWUpperBound := b - a + xT
 
 	// while xW < b - a + xT:
-	for xW.Cmp(tmp.Add(tmp.Sub(b, a), xT)) < 0 {
+	for xW.Cmp(xWUpperBound) < 0 {
+		fVal := f(yW, k, p)
+
 		// xW := xW + f(yW)
-		xW.Add(xW, f(yW, k, p))
+		xW.Add(xW, fVal)
 
 		// yW := yW * g^f(yW)
-		yW.Mod(yW.Mul(yW, tmp.Exp(g, f(yW, k, p), p)), p)
+		yW.Mod(yW.Mul(yW, tmp.Exp(g, fVal, p)), p)
 
 		// if yW = yT:
 		if yW.Cmp(yT) == 0 {

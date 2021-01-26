@@ -30,20 +30,19 @@ func pickRandomPoint(curve elliptic.Curve, order *big.Int) (x *big.Int, y *big.I
 // ecdh performs DH with given curve, public and private keys
 func ecdh(curve elliptic.Curve, x *big.Int, y *big.Int, privateKey []byte) []byte {
 	ssx, ssy := curve.ScalarMult(x, y, privateKey)
-	k := append(elliptic.Marshal(curve, ssx, ssy))
-	return oracle.MAC(k)
+	return oracle.MAC(elliptic.Marshal(curve, ssx, ssy))
 }
 
 // checkDuplicate returns true if no duplicates were found
-func checkDuplicate(modules []*big.Int, reminders []*big.Int, m *big.Int, r *big.Int) bool {
-	if len(modules) != len(reminders) {
-		panic("checkDuplicate: len(modules) != len(reminders)")
+func checkDuplicate(reminders []*big.Int, modules []*big.Int, r *big.Int, m *big.Int) bool {
+	if len(reminders) != len(modules) {
+		panic("checkDuplicate: len(reminders) != len(modules)")
 	}
 
 	ok := true
 
-	for i := 0; i < len(modules); i++ {
-		if modules[i].Cmp(m) == 0 && reminders[i].Cmp(r) == 0 {
+	for i := 0; i < len(reminders); i++ {
+		if reminders[i].Cmp(m) == 0 || modules[i].Cmp(r) == 0 {
 			ok = false
 			break
 		}
@@ -74,9 +73,9 @@ func InvalidCurveAttack(oracleECDH func(x, y *big.Int) []byte) (*big.Int, error)
 			for k := big.NewInt(1); k.Cmp(factor) <= 0; k.Add(k, helpers.BigOne) {
 				ss1 := ecdh(curve, x, y, k.Bytes())
 
-				if hmac.Equal(ss, ss1) && checkDuplicate(modules, remainders, factor, k) {
-					modules = append(modules, factor)
+				if hmac.Equal(ss, ss1) && checkDuplicate(remainders, modules, k, factor) {
 					remainders = append(remainders, new(big.Int).Set(k))
+					modules = append(modules, factor)
 					break
 				}
 			}
