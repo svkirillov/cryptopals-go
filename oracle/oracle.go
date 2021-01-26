@@ -50,6 +50,7 @@ func NewX128TwistAttackOracle() (
 	ecdh func(x *big.Int) []byte,
 	isKeyCorrect func([]byte) bool,
 	getPublicKey func() *big.Int,
+	privateKeyOracle func(q *big.Int) *big.Int,
 ) {
 	privateKey, publicKey, err := x128.GenerateKey(nil)
 	if err != nil {
@@ -77,6 +78,10 @@ func NewX128TwistAttackOracle() (
 
 	getPublicKey = func() *big.Int {
 		return publicKey
+	}
+
+	privateKeyOracle = func(q *big.Int) *big.Int {
+		return new(big.Int).Mod(new(big.Int).SetBytes(privateKey), q)
 	}
 
 	return
