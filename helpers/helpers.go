@@ -1,9 +1,7 @@
 package helpers
 
 import (
-	"crypto/hmac"
 	"crypto/rand"
-	"crypto/sha256"
 	"fmt"
 	"math/big"
 )
@@ -83,10 +81,4 @@ func Factorize(n *big.Int, upperBound *big.Int) []*big.Int {
 	}
 
 	return factors
-}
-
-func MAC(key []byte, msg []byte) []byte {
-	mac := hmac.New(sha256.New, key)
-	mac.Write(msg)
-	return mac.Sum(nil)
 }

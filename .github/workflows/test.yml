@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        challenges: [ challenge57, challenge58, challenge60 ]
+        challenges: [ challenge57, challenge58, challenge59, challenge60 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
