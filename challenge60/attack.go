@@ -363,6 +363,7 @@ func getCandidatesForPrivateKey(
 	l := len(modules)
 	pow := 1 << l
 
+next:
 	for i := 0; i < pow; i++ {
 		for j := 0; j < l; j++ {
 			if (i>>j)&1 == 1 {
@@ -379,6 +380,12 @@ func getCandidatesForPrivateKey(
 
 		ss1 := ecdh(g, possibleKey.Bytes())
 		if hmac.Equal(ss, ss1) {
+			for _, candidate := range candidates {
+				if possibleKey.Cmp(candidate) == 0 {
+					continue next
+				}
+			}
+
 			candidates = append(candidates, possibleKey)
 		}
 	}
