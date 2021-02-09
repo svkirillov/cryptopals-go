@@ -33,7 +33,7 @@ func TestECKangarooAlgorithm(t *testing.T) {
 		K := calcK(a, b)
 		N := calcN(curve.Params().N, K)
 		xT, xyT, yyT := tameKangaroo(curve, bx, by, b, K, N)
-		kk := catchingWildKangaroo(curve, bx, by, x, y, xT, xyT, yyT, K, a, b, context.Background())
+		kk := catchingWildKangaroo(context.Background(), curve, bx, by, x, y, xT, xyT, yyT, K, a, b)
 		if kk == nil || kk.Cmp(k) != 0 {
 			t.Fatal("Pollard's method for catching kangaroos on elliptic curves fails")
 		}

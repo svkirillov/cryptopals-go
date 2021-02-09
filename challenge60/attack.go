@@ -178,7 +178,7 @@ func tameKangaroo(curve elliptic.Curve, bx, by, b, k, N *big.Int) (xT *big.Int, 
 }
 
 // catchingWildKangaroo implements Pollard's method for catching kangaroos.
-func catchingWildKangaroo(curve elliptic.Curve, bx, by, x, y, xT, xyT, yyT, k, a, b *big.Int, ctx context.Context) *big.Int {
+func catchingWildKangaroo(ctx context.Context, curve elliptic.Curve, bx, by, x, y, xT, xyT, yyT, k, a, b *big.Int) *big.Int {
 	curveN := curve.Params().N
 
 	// xW := 0
@@ -292,7 +292,7 @@ func getRemaindersOfPrivateKey(
 	for _, point := range points {
 		answer := make(chan equation, nWorkers)
 
-		// step := point.order / nWorkers
+		// step := point.order / (nWorkers - 1)
 		step.SetUint64(uint64(nWorkers-1)).Div(point.order, step)
 
 		// tailFrom := step * (nWorkers - 1)
@@ -451,7 +451,7 @@ func InsecureTwistsAttack(
 			newX, newY = elliptic.Inverse(p128, newX, newY)
 			newX, newY = p128.Add(newX, newY, pkP128x, pkP128y)
 
-			m := catchingWildKangaroo(p128, newBaseX, newBaseY, newX, newY, xT, xyT, yyT, k, a, b, ctx)
+			m := catchingWildKangaroo(ctx, p128, newBaseX, newBaseY, newX, newY, xT, xyT, yyT, k, a, b)
 			if m == nil {
 				ch <- nil
 				return
